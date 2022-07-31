@@ -1,0 +1,6 @@
+.vscode
+.pytest_cache
+src/__pycache__
+src/auction_db.db
+tests/__pycache__
+venv
