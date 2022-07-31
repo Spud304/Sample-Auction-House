@@ -1,7 +1,7 @@
-from models import db
+from src.models import db
 
-from application import Application
-from listings_manager import ListingBlueprint
+from src.application import Application
+from src.listings_manager import ListingBlueprint
 
 app = Application(__name__)
 

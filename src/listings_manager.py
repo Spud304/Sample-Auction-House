@@ -1,4 +1,4 @@
-from models import Listing, db
+from src.models import Listing, db
 from uuid import uuid4
 from flask import Blueprint, jsonify, request
 from json import loads

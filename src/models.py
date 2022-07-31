@@ -28,19 +28,16 @@ class Listing(db.Model):
     def __repr__(self):
         return f'<Listing {self.item_id}>'
 
-class User(db.Model)
+class User(db.Model):
     __tablename__ = 'users'
-    username = Column(String)
+    username = Column(String, primary_key=True)
     password = Column(String)
     balance = Column(Integer)
-    user_id = Column(String, primary_key=True)
 
-    def __init__(self, username, password, balance, user_id):
+    def __init__(self, username, password, balance):
         self.username = username
         self.password = password
         self.balance = balance
-        self.user_id = user_id
-
 
     def __repr__(self):
-        return f'<User {self.user_id}>'
+        return f'<User {self.username}>'
