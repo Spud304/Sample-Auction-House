@@ -1,7 +1,9 @@
-from src.models import Listing, db
+from models import Listing, db, User
 from uuid import uuid4
 from flask import Blueprint, jsonify, request
 from json import loads
+from datetime import datetime as dt
+from constants import TAX, DOWNPAYMENT
 
 
 class ListingBlueprint(Blueprint):
@@ -12,8 +14,23 @@ class ListingBlueprint(Blueprint):
         self.add_url_rule("/listings/buy/<listing_id>", "buy_listing", self.buy_listing, methods=["POST"])
         self.add_url_rule("/listings", "get_listings", self.get_top_listings, methods=["GET"])
 
+
     def create_listing(self):
-        print(request.json)
+        """
+        {
+            "user_id": "",
+            "name": "",
+            "item_id": "",
+            "buy_now": "",
+        }
+        """
+        # print(request.json)
+        user = db.sessio.query(User).filter(User.username == request.json["user_id"]).first()
+        if user.balance < request.json["buy_now"] * DOWNPAYMENT:
+            return "Not enough money", 400
+
+        current_date = dt.now()
+        formatted_date = current_date.strftime("%Y-%m-%d %H:%M")
         obj = loads(request.json)
         listing = Listing(
             name=obj["name"],
@@ -21,7 +38,8 @@ class ListingBlueprint(Blueprint):
             current_bid=0,
             highest_bidder=None,
             buy_now=obj["buy_now"],
-            seller=obj["seller"]
+            seller=obj["user_id"],
+            date_created=formatted_date
         )
         db.session.add(listing)
         db.session.commit()
@@ -40,6 +58,10 @@ class ListingBlueprint(Blueprint):
         obj = loads(request.json)
         print(f'Request price {obj["money"]}, current bid {listing.current_bid}')
         if obj["money"] == listing.buy_now:
+            selling_user = db.session.query(User).filter(User.username == listing.seller).first()
+            buying_user = db.session.query(User).filter(User.username == obj["user_id"]).first()
+            selling_user.balance += listing.buy_now * (1 - TAX)
+            buying_user.balance -= listing.buy_now
             db.session.delete(listing)
             db.session.commit()
             return "Listing bought", 200

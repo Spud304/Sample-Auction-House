@@ -4,3 +4,6 @@ src/__pycache__
 src/auction_db.db
 tests/__pycache__
 venv
+src/auction_db.sqlite
+src/configs
+testing.py

@@ -8,8 +8,26 @@ class UserBlueprint(Blueprint):
     def __init__(self):
         super().__init__("user", __name__)
         self.add_url_rule("/users/create", "create_user", self.create_user, methods=["POST"])
-        self.add_url_rule("/users/<email>", "get_user", self.get_user, methods=["GET"])
+        self.add_url_rule("/users/<email>", "get_user", self.get_user, methods=["GET"]) # add auth header for this, so only the user can get their own user
         self.add_url_rule("/users", "get_users", self.get_users, methods=["GET"])
+        self.add_url_rule("/users/credit/", "credit_user", self.credit_user, methods=["POST"]) # TODO: admin only
+
+    def credit_user(self):
+        """
+        {
+            "user_id": "",
+            "amount": ""
+        }
+        """
+        obj = loads(request.json)
+        user = db.session.query(User).filter(User.username == obj["user_id"]).first()
+        user.balance += obj["amount"]
+        db.session.commit()
+        d = {
+            "user_id": user.username,
+            "balance": user.balance,
+        }
+        return jsonify(d), 200
 
     def create_user(self):
         obj = loads(request.json)
@@ -20,16 +38,24 @@ class UserBlueprint(Blueprint):
         )
         db.session.add(user)
         db.session.commit()
-        return jsonify(user.to_dict()), 201
+        d = {
+            "user_id": user.username,
+            "balance": user.balance,
+        }
+        return jsonify(d), 201
     
     def get_user(self, email):
-        query = db.session.query(User).filter(User.user_id == email)
+        query = db.session.query(User).filter(User.username == email)
         if query.count() == 0:
             return "User does not exist", 404
         user = query.first()
-        return jsonify(user.to_dict()), 200
+        d = {
+            "user_id": user.username,
+            "balance": user.balance,
+        }
+        return jsonify(d), 200
     
     def get_users(self):
         query = db.session.query(User)
-        users = [user.to_dict() for user in query]
+        users = [user.__dict__ for user in query]
         return jsonify(users), 200

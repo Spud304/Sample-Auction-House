@@ -16,14 +16,16 @@ class Listing(db.Model):
     highest_bidder = Column(String)
     buy_now = Column(Integer)
     seller = Column(String)
+    date_created = Column(String)
 
-    def __init__(self, name, item_id, current_bid, highest_bidder, buy_now, seller):
+    def __init__(self, name, item_id, current_bid, highest_bidder, buy_now, seller, date_created):
         self.name = name
         self.item_id = item_id
         self.current_bid = current_bid
         self.highest_bidder = highest_bidder
         self.buy_now = buy_now
         self.seller = seller
+        self.date_created = date_created
 
     def __repr__(self):
         return f'<Listing {self.item_id}>'

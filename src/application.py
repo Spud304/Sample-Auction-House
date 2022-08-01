@@ -7,7 +7,7 @@ class Application(Flask):
 
     def _add_routes(self):
         self.add_url_rule('/', 'index', self.index, methods=['GET'])
-        self.add_url_rule('/_ah/health', 'health', self.health, methods=['GET'])
+        self.add_url_rule('/health', 'health', self.health, methods=['GET'])
 
     def index(self) -> str:
         return 'Hello, World!'
