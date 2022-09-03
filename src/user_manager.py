@@ -1,4 +1,5 @@
 from src.models import db, User
+from src.password_handler import PasswordHandler
 from uuid import uuid4
 from flask import Blueprint, jsonify, request
 from json import loads
@@ -31,10 +32,11 @@ class UserBlueprint(Blueprint):
 
     def create_user(self):
         obj = loads(request.json)
+        hashed_password = PasswordHandler().hash(obj["password"])
         user = User(
             username=obj["username"],
             email=obj["email"],
-            password=obj["password"],
+            password=hashed_password,
             balance=0,
         )
         db.session.add(user)

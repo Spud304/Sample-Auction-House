@@ -10,6 +10,7 @@ db_name = 'auction_db'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_name}.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SECRET_KEY'] = 'secret'
 
 db.init_app(app)
 db.create_all(app=app)
