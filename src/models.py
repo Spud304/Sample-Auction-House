@@ -33,11 +33,13 @@ class Listing(db.Model):
 class User(db.Model):
     __tablename__ = 'users'
     username = Column(String, primary_key=True)
+    email = Column(String)
     password = Column(String)
     balance = Column(Integer)
 
-    def __init__(self, username, password, balance):
+    def __init__(self, username, email, password, balance):
         self.username = username
+        self.email = email
         self.password = password
         self.balance = balance
 

@@ -1,4 +1,4 @@
-from models import db, User
+from src.models import db, User
 from uuid import uuid4
 from flask import Blueprint, jsonify, request
 from json import loads
@@ -15,16 +15,16 @@ class UserBlueprint(Blueprint):
     def credit_user(self):
         """
         {
-            "user_id": "",
+            "username": "",
             "amount": ""
         }
         """
         obj = loads(request.json)
-        user = db.session.query(User).filter(User.username == obj["user_id"]).first()
+        user = db.session.query(User).filter(User.username == obj["username"]).first()
         user.balance += obj["amount"]
         db.session.commit()
         d = {
-            "user_id": user.username,
+            "username": user.username,
             "balance": user.balance,
         }
         return jsonify(d), 200
@@ -33,6 +33,7 @@ class UserBlueprint(Blueprint):
         obj = loads(request.json)
         user = User(
             username=obj["username"],
+            email=obj["email"],
             password=obj["password"],
             balance=0,
         )

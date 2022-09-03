@@ -1,16 +1,17 @@
-from models import Listing, db, User
+import re
+from src.models import Listing, db, User
 from uuid import uuid4
 from flask import Blueprint, jsonify, request
-from json import loads
+from json import load, loads
 from datetime import datetime as dt
-from constants import TAX, DOWNPAYMENT
+from src.constants import TAX, DOWNPAYMENT
 
 
 class ListingBlueprint(Blueprint):
     def __init__(self, name, import_name):
         super().__init__(name, import_name)
         self.add_url_rule("/listings/create", "create_listing", self.create_listing, methods=["POST"])
-        self.add_url_rule("/listings/<user_id>", "get_user_listings", self.get_user_listings, methods=["GET"])
+        self.add_url_rule("/listings/<username>", "get_user_listings", self.get_user_listings, methods=["GET"])
         self.add_url_rule("/listings/buy/<listing_id>", "buy_listing", self.buy_listing, methods=["POST"])
         self.add_url_rule("/listings", "get_listings", self.get_top_listings, methods=["GET"])
 
@@ -18,30 +19,31 @@ class ListingBlueprint(Blueprint):
     def create_listing(self):
         """
         {
-            "user_id": "",
+            "username": "",
             "name": "",
             "item_id": "",
             "buy_now": "",
         }
         """
-        # print(request.json)
-        user = db.sessio.query(User).filter(User.username == request.json["user_id"]).first()
-        if user.balance < request.json["buy_now"] * DOWNPAYMENT:
+        # request.json
+        obj = loads(request.json)
+        user = db.session.query(User).filter(User.username == obj["username"]).first()
+        if user.balance < obj["buy_now"] * DOWNPAYMENT:
             return "Not enough money", 400
 
         current_date = dt.now()
         formatted_date = current_date.strftime("%Y-%m-%d %H:%M")
-        obj = loads(request.json)
         listing = Listing(
-            name=obj["name"],
+            name=obj["username"],
             item_id=obj["item_id"],
             current_bid=0,
             highest_bidder=None,
             buy_now=obj["buy_now"],
-            seller=obj["user_id"],
+            seller=obj["username"],
             date_created=formatted_date
         )
         db.session.add(listing)
+        user.balance = user.balance - (obj["buy_now"] * DOWNPAYMENT)
         db.session.commit()
         print(listing)
         return "Listing created", 201
