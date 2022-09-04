@@ -2,6 +2,7 @@ from src.models import db, User
 from src.password_handler import PasswordHandler
 from uuid import uuid4
 from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash
+from flask_login import current_user, login_required
 from json import loads
 
 
@@ -12,6 +13,12 @@ class UserBlueprint(Blueprint):
         self.add_url_rule("/users/<email>", "get_user", self.get_user, methods=["GET"]) # add auth header for this, so only the user can get their own user
         self.add_url_rule("/users", "get_users", self.get_users, methods=["GET"])
         self.add_url_rule("/users/credit/", "credit_user", self.credit_user, methods=["POST"]) # TODO: admin only
+        self.add_url_rule("/profile", "profile", self.profile, methods=["GET"])
+
+    @login_required
+    def profile(self):
+        print(current_user)
+        return render_template("profile.html", name=current_user.username, balance=current_user.balance)
 
     def credit_user(self):
         """

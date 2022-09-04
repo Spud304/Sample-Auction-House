@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="column is-4 is-offset-4">
+    <div class="box">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="notification is-danger">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+        {% endwith %}
+        <form method="POST" action="/listings/create">
+            <h3 class="title" style="color: brown;">Create Listing</h3>
+            <div class="field">
+                <div class="control">
+                    <input class="input" name="item" type="text" placeholder="Item Name" autofocus="">
+                </div>
+            </div>
+            
+            <div class="field">
+                <div class="control">
+                    <input class="input" name="buy_now" type="text" placeholder="Buy Now Price">
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                <label class="checkbox">
+                    <input type="checkbox">
+                    I agree to the <a href="#">terms and conditions</a>
+                </label>
+                </div>
+            </div>
+            
+            <div class="field is-grouped">
+                <div class="control">
+                <button class="button is-block is-info">
+                    Create Listing
+                </button>
+                </div>
+                <div class="control">
+                <button class="button is-light is-block">
+                    <a href="{{ url_for('index') }}">Cancel</a>
+                </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+  {% endblock %}

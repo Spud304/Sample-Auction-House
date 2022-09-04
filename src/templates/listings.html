@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table class="table">
+    <thead>
+      <tr>
+        <th>Item Name</th>
+        <th>Currentbid</th>
+        <th>Buy Now</th>
+        <th>Time Left</th>
+        <th>Date Created</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for listing in listings %}
+        <tr>
+            <th>{{ listing.item_name }}</th>
+            <th>{{ listing.current_bid }}</th>
+            <th>{{ listing.buy_now }}</th>
+            <th>{{ listing.time_left }}</th>
+            <th>{{ listing.date_created }}</th>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+  {% endblock %}
