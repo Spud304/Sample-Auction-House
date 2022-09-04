@@ -1,12 +1,11 @@
+import re
 from src.models import db, User
 
 from src.application import Application
 from src.listings_manager import ListingBlueprint
 from src.user_manager import UserBlueprint
-from src.password_handler import PasswordHandler
-
-from flask import render_template, request, redirect, url_for, flash
-from uuid import uuid4
+from src.auth import AuthBlueprint
+from flask_login import LoginManager
 
 app = Application(__name__)
 
@@ -17,6 +16,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECRET_KEY'] = 'secret'
 
 db.init_app(app)
+
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 db.create_all(app=app)
 
 listing_bp = ListingBlueprint('listings', __name__)
@@ -25,6 +33,8 @@ app.register_blueprint(listing_bp)
 user_bp = UserBlueprint()
 app.register_blueprint(user_bp)
 
+auth_bp = AuthBlueprint()
+app.register_blueprint(auth_bp)
 
 
 if __name__ == '__main__':

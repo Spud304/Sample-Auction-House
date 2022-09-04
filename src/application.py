@@ -1,4 +1,6 @@
+from contextlib import redirect_stderr
 from flask import Flask, render_template
+from flask_login import login_required, current_user
 
 class Application(Flask):
     def __init__(self, import_name):
@@ -9,20 +11,14 @@ class Application(Flask):
         self.add_url_rule('/', 'index', self.index, methods=['GET'])
         self.add_url_rule('/health', 'health', self.health, methods=['GET'])
         self.add_url_rule('/profile', 'profile', self.profile, methods=['GET']) 
-        self.add_url_rule('/login', 'login', self.login, methods=['GET'])
-        # self.add_url_rule('/signup', 'signup', self.signup, methods=['GET'])
 
     def index(self):
         return render_template('index.html')
 
+    @login_required
     def profile(self):
-        return render_template('profile.html')
-    
-    def login(self):
-        return render_template('login.html')
+        return render_template('profile.html', name=current_user.username)
 
-    # def signup(self):
-    #     return render_template('signup.html')
 
     def health(self) -> str:
         return 'OK'

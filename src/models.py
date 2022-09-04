@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from sqlalchemy import Column, Integer, String, Table
 from sqlalchemy.orm import registry
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 db = SQLAlchemy()
 
@@ -30,9 +31,9 @@ class Listing(db.Model):
     def __repr__(self):
         return f'<Listing {self.item_id}>'
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
-    id_ = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     username = Column(String)
     email = Column(String, unique=True)
     password = Column(String)

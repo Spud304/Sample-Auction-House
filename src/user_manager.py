@@ -12,8 +12,6 @@ class UserBlueprint(Blueprint):
         self.add_url_rule("/users/<email>", "get_user", self.get_user, methods=["GET"]) # add auth header for this, so only the user can get their own user
         self.add_url_rule("/users", "get_users", self.get_users, methods=["GET"])
         self.add_url_rule("/users/credit/", "credit_user", self.credit_user, methods=["POST"]) # TODO: admin only
-        self.add_url_rule("/signup", "signup", self.signup)
-        self.add_url_rule("/signup", "signup_post", self.signup_post, methods=["POST"])
 
     def credit_user(self):
         """
@@ -31,26 +29,6 @@ class UserBlueprint(Blueprint):
             "balance": user.balance,
         }
         return jsonify(d), 200
-    
-    def signup(self):
-        return render_template("signup.html")
-
-    def signup_post(self):
-        email = request.form.get('email')
-        username = request.form.get('name')
-        password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
-        if user:
-            flash('Email address already exists')
-            return redirect(url_for('user.signup'))
-        
-        hashed_password = PasswordHandler().hash(password)
-        new_user = User(email=email, username=username, password=hashed_password, balance=0)
-        db.session.add(new_user)
-        db.session.commit()
-
-        return redirect(url_for('login'))
-
 
     def create_user(self):
         obj = loads(request.json)
