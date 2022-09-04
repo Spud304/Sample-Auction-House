@@ -12,11 +12,15 @@ from src.constants import TAX, DOWNPAYMENT
 class ListingBlueprint(Blueprint):
     def __init__(self, name, import_name):
         super().__init__(name, import_name)
-        self.add_url_rule('//listings/create', 'create_listing', self.create_listing)
+        self.add_url_rule('/listings/create', 'create_listing', self.create_listing)
         self.add_url_rule("/listings/create", "create_listing_post", self.create_listing_post, methods=["POST"])
-        self.add_url_rule("/listings/<username>", "get_user_listings", self.get_user_listings, methods=["GET"])
-        self.add_url_rule("/listings/buy/<listing_id>", "buy_listing", self.buy_listing, methods=["POST"])
+        self.add_url_rule("/listings/<listing_id>", "buy_listing", self.buy_listing)
+        self.add_url_rule("/listings/<listing_id>", "buy_listing_post", self.buy_listing_post, methods=["POST"])
         self.add_url_rule("/listings", "listings", self.get_top_listings, methods=["GET"])
+
+        # self.add_url_rule("/listings/buy/<listing_id>", "buy_listing", self.buy_listing_post, methods=["POST"])
+        
+
 
     @login_required
     def create_listing(self):
@@ -43,37 +47,25 @@ class ListingBlueprint(Blueprint):
         user.balance -= int(request.form["buy_now"]) * DOWNPAYMENT
         db.session.commit()
         return redirect(url_for("index"))
-
     
     def buy_listing(self, listing_id):
-        # buy a listing, if the price is less than the buy now price, then update the highest bidder and current bid
-        # if the money is the buy now price then remove the listing from the database
-        # if the listing does not exist, or money is higher than buy_now, return a 404
+        listing = db.session.query(Listing).filter(Listing.item_id == listing_id).first()
+        return render_template("listing_view.html", listing=listing)
 
-        query = db.session.query(Listing).filter(Listing.item_id == listing_id)
-        if query.count() == 0:
-            return "Listing does not exist", 404
-        listing = query.first()
-        obj = loads(request.json)
-        print(f'Request price {obj["money"]}, current bid {listing.current_bid}')
-        if obj["money"] == listing.buy_now:
-            selling_user = db.session.query(User).filter(User.username == listing.seller).first()
-            buying_user = db.session.query(User).filter(User.username == obj["user_id"]).first()
-            selling_user.balance += listing.buy_now * (1 - TAX)
-            buying_user.balance -= listing.buy_now
-            db.session.delete(listing)
+    def buy_listing_post(self, listing_id):
+        if request.form.get("buy_button") == "buy":
+            listing = db.session.query(Listing).filter(Listing.item_id == listing_id).first()
+            user = current_user
+            if user.balance < listing.buy_now:
+                flash("Not enough money")
+                return redirect(url_for("listings.buy_listing", listing_id=listing_id))
+            if listing.current_bid >= listing.buy_now:
+                flash("Someone has already bought this item")
+                return redirect(url_for("listings.buy_listing", listing_id=listing_id))
+            Listing.query.filter_by(item_id=listing_id).delete()
+            user.balance -= listing.buy_now
             db.session.commit()
-            return "Listing bought", 200
-        elif obj["money"] < listing.buy_now and obj["money"] > listing.current_bid:
-            listing.highest_bidder = obj["user_id"]
-            listing.current_bid = obj["money"]
-            db.session.commit()
-            print(f'Listing has been updated to {listing.current_bid}')
-            return "Listing updated", 200
-        elif obj["money"] <= listing.current_bid:
-            return "Not enough money", 400
-        
-        return "Listing does not exist", 404
+            return redirect(url_for("index"))
 
     def get_user_listings(self, user_id):
         # get all listings for a user

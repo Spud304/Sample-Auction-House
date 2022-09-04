@@ -33,7 +33,7 @@ class AuthBlueprint(Blueprint):
 
         # if the above check passes, then we know the user has the right credentials
         login_user(user, remember=remember)
-        return redirect(url_for('profile'))
+        return redirect(url_for('user.profile'))
 
     def signup(self):
         return render_template("signup.html")

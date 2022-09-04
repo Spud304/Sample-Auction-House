@@ -17,7 +17,6 @@ class UserBlueprint(Blueprint):
 
     @login_required
     def profile(self):
-        print(current_user)
         return render_template("profile.html", name=current_user.username, balance=current_user.balance)
 
     def credit_user(self):

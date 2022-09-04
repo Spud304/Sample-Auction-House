@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Add icon library -->
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+    margin: auto;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 40px;
+    text-align: center;
+  }
+  
+  button {
+    border: none;
+    outline: 0;
+    display: inline-block;
+    padding: 8px;
+    color: white;
+    background-color: #000;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+  }
+  
+  a {
+    text-decoration: none;
+    font-size: 22px;
+    color: black;
+  }
+  
+  button:hover, a:hover {
+    opacity: 0.7;
+  }
+</style>
+</head>
+
+<div class="card">
+  <img src="https://cdn.discordapp.com/attachments/988552102773133345/1014170102041694238/lilkvsh_2022-08-30__154928.jpg" alt="John" style="width:100%">
+  {% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="notification is-danger">
+        {{ messages[0] }}
+    </div>
+{% endif %}
+{% endwith %}
+  <p class="title" style="color: brown;"> {{ listing.name }} </p>
+  <p>Price: {{ listing.buy_now | int }} </p>
+    <form method="POST" action="{{ url_for('listings.buy_listing_post', listing_id=listing.item_id) }}">
+        <button class="button is-info is-small" value="buy" name="buy_button" type="submit">Buy Now</button>
+    </form>
+</div>
+{% endblock %}
