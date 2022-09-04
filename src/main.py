@@ -1,8 +1,12 @@
-from src.models import db
+from src.models import db, User
 
 from src.application import Application
 from src.listings_manager import ListingBlueprint
 from src.user_manager import UserBlueprint
+from src.password_handler import PasswordHandler
+
+from flask import render_template, request, redirect, url_for, flash
+from uuid import uuid4
 
 app = Application(__name__)
 
@@ -20,6 +24,8 @@ app.register_blueprint(listing_bp)
 
 user_bp = UserBlueprint()
 app.register_blueprint(user_bp)
+
+
 
 if __name__ == '__main__':
     app.run(host='localhost', port = 8080, debug=True)

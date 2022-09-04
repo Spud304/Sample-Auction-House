@@ -32,16 +32,18 @@ class Listing(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
-    username = Column(String, primary_key=True)
-    email = Column(String)
+    id_ = Column(Integer, primary_key=True)
+    username = Column(String)
+    email = Column(String, unique=True)
     password = Column(String)
     balance = Column(Integer)
 
-    def __init__(self, username, email, password, balance):
-        self.username = username
-        self.email = email
-        self.password = password
-        self.balance = balance
+    # def __init__(self, username, email, password, balance, id_):
+    #     self.id_ = id_
+    #     self.username = username
+    #     self.email = email
+    #     self.password = password
+    #     self.balance = balance
 
     def __repr__(self):
         return f'<User {self.username}>'
